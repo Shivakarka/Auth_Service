@@ -18,6 +18,28 @@ class UserService {
     }
   }
 
+  async signIn(email, password) {
+    try {
+      const user = await this.userRepository.getByEmail(email);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      const isPasswordCorrect = this.checkPassword(password, user.password);
+      if (!isPasswordCorrect) {
+        console.log("Passwords do not match");
+        throw new Error("Password is incorrect");
+      }
+      const token = this.createToken({
+        email: user.email,
+        id: user.id,
+      });
+      return token;
+    } catch (error) {
+      console.log("Something went wrong in sign in process");
+      throw error;
+    }
+  }
+
   createToken(user) {
     try {
       const token = jwt.sign(user, JWT_KEY, { expiresIn: "1h" });
