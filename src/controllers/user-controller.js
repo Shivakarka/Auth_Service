@@ -65,8 +65,39 @@ const isAuthenticated = async (req, res) => {
   }
 };
 
+const isAdmin = async (req, res) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const userId = await userService.isAuthenticated(token);
+    if (!userId) {
+      return res.status(401).json({
+        message: "User is not authenticated",
+        data: {},
+        success: false,
+        err: {},
+      });
+    }
+    const response = await userService.isAdmin(req.body.userId);
+    return res.status(200).json({
+      success: true,
+      err: {},
+      data: response,
+      message: "Successfully checked if user is admin",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Something went wrong",
+      data: {},
+      success: false,
+      err: error,
+    });
+  }
+};
+
 module.exports = {
   create,
   signIn,
   isAuthenticated,
+  isAdmin,
 };
