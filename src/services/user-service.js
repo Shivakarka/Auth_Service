@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const UserRepository = require("../repository/user-repository");
 const { JWT_KEY } = require("../config/serverConfig");
-const AppErrors = require("../utils/error-handler");
 
 class UserService {
   constructor() {
@@ -25,9 +24,6 @@ class UserService {
   async signIn(email, password) {
     try {
       const user = await this.userRepository.getByEmail(email);
-      if (!user) {
-        throw new Error("User not found");
-      }
       const isPasswordCorrect = this.checkPassword(password, user.password);
       if (!isPasswordCorrect) {
         console.log("Passwords do not match");
@@ -39,6 +35,9 @@ class UserService {
       });
       return token;
     } catch (error) {
+      if (error.name == "AttributeNotFound") {
+        throw error;
+      }
       console.log("Something went wrong in sign in process");
       throw error;
     }

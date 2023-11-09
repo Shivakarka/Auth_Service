@@ -38,13 +38,11 @@ const signIn = async (req, res) => {
       err: {},
     });
   } catch (error) {
-    res.status(401).json({
-      message: "Authentication failed",
+    res.status(error.statusCode).json({
+      message: error.message,
       data: {},
       success: false,
-      err: {
-        message: error.message,
-      },
+      err: error.explanation,
     });
   }
 };
